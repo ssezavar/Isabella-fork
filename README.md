@@ -273,6 +273,12 @@ end
 
 ## Quick start
 
+`scripts/isabella.jl` goes from a YAML file to a project tree in one step. It
+is for a single user with their own Julia, and for development. The plan for
+classes is different: one shared Julia server, with students running the bash
+client [`controller_project`](#project-template-script-controller_project), so
+nobody has to install Julia. Both write the same files.
+
 Install [Julia](https://julialang.org/downloads/), then from this directory:
 
 ```
@@ -352,6 +358,12 @@ Basys3 with Vivado and run it on the board (September 2026), with the upstream
 FSM and timer. The changes in this copy, the one clock command fetch, the
 parameterized timer and the register command fixes, have only been simulated.
 
-`scripts/controller_project`, the older bash entry point, still works if you
-feed it the intermediate YAML, but `scripts/isabella.jl` replaces it and
-does not need bash, yq or realpath.
+There are two ways from a YAML file to a project tree, and both write the
+same 13 files. `scripts/isabella.jl` does it in one step, for single users and
+development. `scripts/controller_project bundle.yaml` unpacks the bundle that
+`generate_controller_project` writes (see
+[Using the Isabella Julia Module](#using-the-isabella-julia-module)) into
+`bundle/`, and is the client side of the server setup planned for classes. It
+needs bash, `realpath`, and kislyuk's Python `yq`, which is a different
+program from the Go `yq` some systems install under the same name. CI runs
+both on every example and checks that they match.

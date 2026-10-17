@@ -104,3 +104,26 @@ jobs:
                    src/timer.sv src/ctrl_t6.sv
           vvp t6.vvp | tee out.txt
           grep -q "ALL T6 CHECKS PASSED" out.txt
+
+      # sara 10/14/26: T9, the bash path. that is the student side of the
+      # server plan, and nothing ran it before. julia writes the bundle the
+      # way the README shows, controller_project unpacks it, and the tree
+      # has to match isabella.jl. the script's echo ends every file with a
+      # newline and isabella.jl does not always, so ref gets one first.
+      # the runner's own yq is the Go one, the script wants kislyuk's.
+      - name: bash path, controller_project on all four examples
+        run: |
+          python3 -m venv "$RUNNER_TEMP/yq"
+          "$RUNNER_TEMP/yq/bin/pip" install -q yq==3.4.3
+          export PATH="$RUNNER_TEMP/yq/bin:$PATH"
+          yq --version
+          mkdir -p build/bash && cd build/bash
+          for ex in controller_with_shift controller_with_multiple_programs \
+                    seven_segment led_controller_bigger; do
+            julia --project=../.. -e 'using Isabella, YAML; YAML.write_file(ARGS[2], generate_controller_project(YAML.load_file(ARGS[1])))' \
+                  ../../examples/$ex.yaml $ex.yaml
+            ../../scripts/controller_project $ex.yaml
+            julia --project=../.. ../../scripts/isabella.jl ../../examples/$ex.yaml -o ref_$ex -f -q
+            find ref_$ex -type f -exec sed -i -e '$a\' {} +
+            diff -r ref_$ex $ex
+          done

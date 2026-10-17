@@ -32,6 +32,10 @@ on a board but wrong, and the fix costs nothing.
 
 ## 2. Generate
 
+This uses `scripts/isabella.jl`, the one step path for a single user. On a
+shared server setup the bash client, `scripts/controller_project`, writes the
+same 13 files (README, Quick start).
+
 ```
 julia --project=. scripts/isabella.jl seven_segment.yaml
 ```

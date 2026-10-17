@@ -10,8 +10,10 @@
 ##
 ## usage: controller_project [-v] <yaml_filename>
 ##
-## 9/12/26 sara: superseded by scripts/isabella.jl, kept so the old
-## flow still works. -v brings the name checking chatter back.
+## 9/12/26 sara: -v brings the name checking chatter back.
+## sara (10/13/26): this is the student path for 3700, a bash client
+## talking to one shared julia server. scripts/isabella.jl does the
+## same job in one step, for single users and development.
 ##
 ##===========================================================##
 
@@ -112,6 +114,9 @@ for i in $(seq 0 $(( $num_filenames-1 )) ); do
 
     check_filename "$filename"
     if [ $? == 0 ]; then
+	# Sara, 10/15: top/ and sim/ (F7) were never created, so those two
+	# files failed and got lost. make the folder each file needs.
+	mkdir -p "$(dirname "$project_name/$filename")"
 	contents=`echo "$yaml" | yq --raw-output .[$i].contents`
 	echo "$contents" > "$project_name/$filename"
     else
